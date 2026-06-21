@@ -1,0 +1,11 @@
+.git
+.gitignore
+.github
+__pycache__
+*.pyc
+config.py
+.homeos_sent
+*.md
+*.zip
+.venv
+venv
