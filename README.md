@@ -1,6 +1,6 @@
-# HomeOS File Transfer — Sync RPi → NAS DS420+
+# HomeOS File Transfer
 
-Spooler Python qui surveille des dossiers locaux et transfère automatiquement leur contenu vers un NAS Synology DS420+. Conçu pour tourner sur un Raspberry Pi 3 (ou tout Linux amd64/arm64), sans droits root, sans montage réseau.
+Spooler Python qui surveille des dossiers locaux et transfère automatiquement leur contenu vers un NAS. Conçu pour tourner sur un petit hardware (Raspberry Pi, ou tout Linux amd64/arm64), sans droits root, sans montage réseau.
 
 ---
 
@@ -10,15 +10,6 @@ Spooler Python qui surveille des dossiers locaux et transfère automatiquement l
 - Un fichier n'est transféré que s'il est **stable** : son `mtime` n'a pas changé depuis `STABILITY_SECONDS` secondes et son extension n'est pas dans la liste de temporaires (`.part`, `.tmp`, `.crdownload`…).
 - Après un upload réussi : le fichier est **déplacé** dans `.homeos_sent/` (ou **supprimé** si `delete_after: true`).
 - En cas d'échec réseau : le fichier reste en place et sera retenté au prochain scan. Le spooler ne crashe jamais.
-
-### Deux transports disponibles
-
-| Transport | Protocole | Dépendance | Conseil |
-|---|---|---|---|
-| `smb` | SMB/CIFS pur Python | `smbprotocol` | Recommandé — pas de montage réseau |
-| `filestation` | API DSM REST | `requests` | Utile si SMB est bloqué |
-
-Les deux fonctionnent avec un **compte non-admin** (droits R/W sur les partages ciblés suffisent).
 
 ---
 
