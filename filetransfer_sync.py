@@ -36,27 +36,31 @@ from typing import Protocol
 # En mode Docker, config.py peut être absent : les variables d'environnement
 # NAS_HOST, NAS_USER, NAS_PASS et SYNC_JOBS (JSON) prennent le relais.
 try:
-    import config  # type: ignore
+    import config  # type: ignore      # monté par Docker (-v config.py:/app/config_docker.py)
 except ImportError:
-    import types as _types
-    _required = [v for v in ("NAS_HOST", "NAS_USER", "NAS_PASS", "SYNC_JOBS")
-                 if not os.environ.get(v)]
-    if _required:
-        print(f"ERREUR : config.py introuvable et variables manquantes : {_required}\n"
-              "Copie config.example.py -> config.py ou définis les variables d'env.",
-              file=sys.stderr)
-        sys.exit(1)
-    config = _types.SimpleNamespace(  # type: ignore[assignment]
-        NAS_HOST=os.environ["NAS_HOST"],
-        NAS_USER=os.environ["NAS_USER"],
-        NAS_PASS=os.environ["NAS_PASS"],
-        TRANSPORT=os.environ.get("TRANSPORT", "smb"),
-        NAS_PORT=int(os.environ.get("NAS_PORT", "5000")),
-        NAS_HTTPS=os.environ.get("NAS_HTTPS", "false").lower() == "true",
-        STABILITY_SECONDS=int(os.environ.get("STABILITY_SECONDS", "15")),
-        SCAN_INTERVAL=int(os.environ.get("SCAN_INTERVAL", "30")),
-        SYNC_JOBS=json.loads(os.environ["SYNC_JOBS"]),
-    )
+    try:
+        import config as config  # type: ignore   # exécution locale directe
+    except ImportError:
+        import types as _types
+        _required = [v for v in ("NAS_HOST", "NAS_USER", "NAS_PASS", "SYNC_JOBS")
+                     if not os.environ.get(v)]
+        if _required:
+            print(f"ERREUR : config_docker.py et config.py introuvables, "
+                  f"variables manquantes : {_required}\n"
+                  "Copie config.example.py -> config.py ou définis les variables d'env.",
+                  file=sys.stderr)
+            sys.exit(1)
+        config = _types.SimpleNamespace(  # type: ignore[assignment]
+            NAS_HOST=os.environ["NAS_HOST"],
+            NAS_USER=os.environ["NAS_USER"],
+            NAS_PASS=os.environ["NAS_PASS"],
+            TRANSPORT=os.environ.get("TRANSPORT", "smb"),
+            NAS_PORT=int(os.environ.get("NAS_PORT", "5000")),
+            NAS_HTTPS=os.environ.get("NAS_HTTPS", "false").lower() == "true",
+            STABILITY_SECONDS=int(os.environ.get("STABILITY_SECONDS", "15")),
+            SCAN_INTERVAL=int(os.environ.get("SCAN_INTERVAL", "30")),
+            SYNC_JOBS=json.loads(os.environ["SYNC_JOBS"]),
+        )
 
 SENT_DIRNAME = ".homeos_sent"
 log = logging.getLogger("homeos_sync")

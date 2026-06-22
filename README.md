@@ -27,7 +27,7 @@ Les deux fonctionnent avec un **compte non-admin** (droits R/W sur les partages 
 ```bash
 git clone <url-du-dépôt>
 cd file_transfer
-python -m venv .venv && source .venv/bin/activate
+python -m venv .venv && source .venv/bin/activate # opt
 pip install -r requirements.txt
 cp config.example.py config.py   # puis éditer config.py
 ```
@@ -50,7 +50,7 @@ Copier `config.example.py` en `config.py` (gitignored) et remplir les champs :
 
 ```python
 NAS_HOST = "192.168.1.50"       # IP ou nom d'hôte du NAS
-NAS_USER = "homeos"             # compte non-admin avec droits R/W
+NAS_USER = "user"               # compte non-admin avec droits R/W
 NAS_PASS = "mot_de_passe"
 
 TRANSPORT = "smb"               # "smb" ou "filestation"
@@ -63,16 +63,10 @@ SCAN_INTERVAL     = 30          # intervalle entre deux scans (mode boucle)
 SYNC_JOBS = [
     {
         "name": "music",
-        "local": "~/homeos/downloads/music",
-        "remote": "/music",         # 1er segment = nom du partage Synology
-        "delete_after": False,      # False = déplacer vers .homeos_sent/
-    },
-    {
-        "name": "sensors",
-        "local": "~/homeos/exports/sensors",
-        "remote": "/data/sensors",
-        "ignore_ext": [".tmp"],
-        "delete_after": True,
+        "local": "local_folder",
+        "remote": "/remote_folder",         # nom du partage Synology
+        "delete_after": False,              # False = déplacer vers .homeos_sent/
+        "ignore_ext": [".tmp"]
     },
 ]
 ```
@@ -113,21 +107,6 @@ Sans `config.py`, le container lit sa configuration depuis les variables d'envir
 | `STABILITY_SECONDS` | non | `15` | Délai de stabilité en secondes |
 | `SCAN_INTERVAL` | non | `30` | Intervalle de scan en secondes |
 
----
-
-## CI/CD — GitHub Actions
-
-Le workflow `.github/workflows/docker-build.yml` construit automatiquement une image multi-plateforme et la publie sur le GitHub Container Registry (GHCR) :
-
-- **`linux/amd64`** — PC Ubuntu 22 ou serveur x86
-- **`linux/arm64`** — Raspberry Pi 3 avec OS 64-bit
-
-Le build est déclenché à chaque push sur `main`/`master` ou à la création d'un tag `v*`. Les pull requests déclenchent un build de vérification sans push.
-
-```bash
-# Utiliser l'image publiée sur GHCR
-docker pull ghcr.io/<owner>/homeos-file-transfer:main
-```
 
 ---
 
